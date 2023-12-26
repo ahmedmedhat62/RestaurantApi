@@ -97,6 +97,7 @@ namespace RestaurantApi.Interfaces
 
         public async Task Register(UserRegister model)
         {
+            
             var existingUser = await _userManager.FindByEmailAsync(model.Email);
             if (existingUser != null)
             {

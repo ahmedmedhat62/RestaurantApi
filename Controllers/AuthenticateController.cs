@@ -12,11 +12,11 @@ namespace RestaurantApi.Controllers
 {
     [Route("api/account")]
     [ApiController]
-    public class AuthController : ControllerBase
+    public class UsersController : ControllerBase
     {
         private IUsersService _usersService;
 
-        public AuthController(IUsersService usersService)
+        public UsersController(IUsersService usersService)
         {
             _usersService = usersService;
         }
@@ -61,7 +61,7 @@ namespace RestaurantApi.Controllers
 
             return BadRequest();
         }
-        [HttpPut("Update profile")]
+        [HttpPut("Profile")]
         [Authorize]
         public async Task<IActionResult> UpdateProfile([FromBody] UserEdit model)
         {
