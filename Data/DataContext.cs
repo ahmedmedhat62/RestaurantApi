@@ -13,11 +13,14 @@ namespace RestaurantApi.Data
             
         }
         public override DbSet<Role> Roles { get; set; }
+
+       
         protected override void OnModelCreating(ModelBuilder builder)
         {
             base.OnModelCreating(builder);
         }
         public DbSet<Dishes> Dishes { get; set; }
-       // public DbSet<User> Users { get; set; }
+        public DbSet<Basket> Baskets { get; set; }
+        // public DbSet<User> Users { get; set; }
     }
 }

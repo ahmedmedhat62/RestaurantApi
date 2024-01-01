@@ -120,7 +120,12 @@ namespace RestaurantApi.Repository
         {
             return _context.Dishes.FirstOrDefault(x => x.Id == dishId);
         }
-       
+
+        public async Task<Dishes> GetDishById1(int dishId)
+        {
+            return await _context.Dishes.FindAsync(dishId);
+        }
+
 
     }
 }

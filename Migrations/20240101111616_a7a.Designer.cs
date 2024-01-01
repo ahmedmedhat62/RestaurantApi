@@ -12,8 +12,8 @@ using RestaurantApi.Data;
 namespace RestaurantApi.Migrations
 {
     [DbContext(typeof(DataContext))]
-    [Migration("20231129124233_init")]
-    partial class init
+    [Migration("20240101111616_a7a")]
+    partial class a7a
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -216,6 +216,23 @@ namespace RestaurantApi.Migrations
                         .HasFilter("[NormalizedUserName] IS NOT NULL");
 
                     b.ToTable("AspNetUsers", (string)null);
+                });
+
+            modelBuilder.Entity("RestaurantApi.Models.Basket", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<string>("testStr")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("Baskets");
                 });
 
             modelBuilder.Entity("RestaurantApi.Models.Dishes", b =>
