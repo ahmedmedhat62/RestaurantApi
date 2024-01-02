@@ -21,6 +21,7 @@ namespace RestaurantApi.Data
         }
         public DbSet<Dishes> Dishes { get; set; }
         public DbSet<Basket> Baskets { get; set; }
+        public DbSet<DishBasketDTO> dishBasketDTOs { get; set; }
         // public DbSet<User> Users { get; set; }
     }
 }

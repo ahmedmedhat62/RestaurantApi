@@ -14,6 +14,7 @@ namespace RestaurantApi.Interfaces
         //Task<bool> AddDishToBasketAsync(Guid userId, int dishId);
         Task<bool> AddStringToBasketAsync(string userEmail,int id);
         Task<List<DishBasketDTO>> GetDishesInBasketAsync(string userEmail);
+        Task<bool> AdjustDishAmountInBasketAsync(string userEmail, int dishId, bool? increase = false);
 
     }
 }
@@ -108,13 +109,41 @@ public class BasketService : IBasketService
                 _dbContext.Baskets.Add(basket);
             }
 
-            // Add the dish to the basket
-            var dish = await _dbContext.Dishes.FindAsync(id);
-            if (dish != null && !basket.Dishes.Contains(dish))
-            {
-                basket.Dishes.Add(dish);
-            }
+            // Check if the dish is already in the basket
+            var existingDish = basket.Dishes.FirstOrDefault(d => d.Id == id);
 
+            if (existingDish != null)
+            {
+                // If the dish is already in the basket, increment the amount
+                existingDish.Amount++;
+                existingDish.TotalPrice = existingDish.Amount * existingDish.Price;
+            }
+            else
+            {
+                // If the dish is not in the basket, add it with an initial amount of 1
+                var dish = await _dbContext.Dishes.FindAsync(id);
+
+                if (dish != null)
+                {
+                    basket.Dishes.Add(new DishBasketDTO
+                    (
+                          dish.Id,
+                          dish.Name,
+                        dish.Price,
+                         1,
+                        
+                        dish.Photo
+                    // Other properties from DishBasketDTO
+                    )
+                    { });
+                    
+                }
+                else
+                {
+                    Console.WriteLine($"Failed to add dish to the basket. Dish with ID {id} not found.");
+
+                }
+            }
 
             await _dbContext.SaveChangesAsync();
             return true;
@@ -134,15 +163,57 @@ public class BasketService : IBasketService
                 .Include(b => b.Dishes)
                 .FirstOrDefaultAsync(b => b.Useremail == userEmail);
 
-            var dishBasketDTOs = basket?.Dishes.Select(dish => new DishBasketDTO(dish)).ToList() ?? new List<DishBasketDTO>();
+            var dishBasketDTOs = basket?.Dishes.ToList() ?? new List<DishBasketDTO>();
 
             return dishBasketDTOs;
         }
-
         catch (Exception ex)
         {
             // Log or handle the exception as needed
             return new List<DishBasketDTO>();
+        }
+    }
+
+    public async Task<bool> AdjustDishAmountInBasketAsync(string userEmail, int dishId, bool? increase = false)
+    {
+        try
+        {
+            var basket = await _dbContext.Baskets
+                .Include(b => b.Dishes)
+                .FirstOrDefaultAsync(b => b.Useremail == userEmail);
+
+            if (basket != null)
+            {
+                var dishToUpdate = basket.Dishes.FirstOrDefault(d => d.Id == dishId);
+
+                if (dishToUpdate != null)
+                {
+                    if (increase == true)
+                    {
+                        // Increase the amount
+                        dishToUpdate.Amount--;
+                        dishToUpdate.TotalPrice = dishToUpdate.Amount * dishToUpdate.Price;
+
+                    }
+                    else
+                    {
+                        
+                        {
+                            basket.Dishes.Remove(dishToUpdate);
+                        }
+                    }
+
+                    await _dbContext.SaveChangesAsync();
+                    return true;
+                }
+            }
+
+            return false;
+        }
+        catch (Exception ex)
+        {
+            // Log or handle the exception as needed
+            return false;
         }
     }
 

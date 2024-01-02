@@ -9,6 +9,7 @@ namespace RestaurantApi.Models
         public int Id { get; set; }
 
         
+        public int dishId { get; set; }
 
         public string Name { get; set; }
 
@@ -20,16 +21,15 @@ namespace RestaurantApi.Models
 
         public string Image { get; set; }
 
-        public DishBasketDTO(Dishes dish)
+        public DishBasketDTO(int id, string name, int price, int amount, string image)
         {
-            Id = dish.Id;
-            Name = dish.Name;
-            Price = dish.Price;
-            // You might want to calculate TotalPrice and set it based on the logic you have
-            Amount = 1; // You can set an initial amount
-            TotalPrice = dish.Price * Amount;
+            Id = id;
+            Name = name;
+            Price = price;
            
-            Image = dish.Photo;
+            Amount = amount;
+            TotalPrice = price * amount;
+            Image = image;
         }
 
     }

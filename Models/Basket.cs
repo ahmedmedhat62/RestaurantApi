@@ -6,17 +6,12 @@ namespace RestaurantApi.Models
     {
         [Key]
         public int Id { get; set; }
-
-
-        /*
-                public Guid UserId { get; set; }
-
-                public List<DishBasketDTO> dishes { get; set; }*/
-        public List<Dishes> Dishes { get; set; } = new List<Dishes>();
+        public List<DishBasketDTO> Dishes { get; set; } = new List<DishBasketDTO>();
         public int dish_id { get; set; }
         public string Useremail { get; set; }
 
 
 
     }
+
 }
