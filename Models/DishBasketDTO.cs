@@ -7,8 +7,8 @@ namespace RestaurantApi.Models
 
         [Key]
         public int Id { get; set; }
-
         
+
         public int dishId { get; set; }
 
         public string Name { get; set; }
@@ -21,15 +21,19 @@ namespace RestaurantApi.Models
 
         public string Image { get; set; }
 
-        public DishBasketDTO(int id, string name, int price, int amount, string image)
+        public DishBasketDTO(int dish_id, string name, int price, int amount, string image)
         {
-            Id = id;
+            dishId = dish_id;
             Name = name;
             Price = price;
            
             Amount = amount;
             TotalPrice = price * amount;
             Image = image;
+        }
+        public DishBasketDTO()
+        {
+           
         }
 
     }

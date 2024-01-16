@@ -110,7 +110,7 @@ public class BasketService : IBasketService
             }
 
             // Check if the dish is already in the basket
-            var existingDish = basket.Dishes.FirstOrDefault(d => d.Id == id);
+            var existingDish = basket.Dishes.FirstOrDefault(d => d.dishId == id);
 
             if (existingDish != null)
             {
@@ -184,7 +184,7 @@ public class BasketService : IBasketService
 
             if (basket != null)
             {
-                var dishToUpdate = basket.Dishes.FirstOrDefault(d => d.Id == dishId);
+                var dishToUpdate = basket.Dishes.FirstOrDefault(d => d.dishId == dishId);
 
                 if (dishToUpdate != null)
                 {

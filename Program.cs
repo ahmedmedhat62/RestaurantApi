@@ -11,8 +11,7 @@ using RestaurantApi.Data;
 using RestaurantApi.Interfaces;
 using RestaurantApi.Models;
 using RestaurantApi.Repository;
-//using RestaurantApi.Services;
-//using RestaurantApi.Services;
+using RestaurantApi.Services;
 using System;
 using System.Security.Claims;
 using System.Text;
@@ -29,6 +28,7 @@ builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddScoped<Idishes, DishesRepository>();
 builder.Services.AddScoped<IUsersService, UsersService>();
 builder.Services.AddScoped<IBasketService, BasketService>();
+builder.Services.AddScoped<IOrderService, OrderService>();
 
 
 //builder.Services.AddScoped<JwtService>();
