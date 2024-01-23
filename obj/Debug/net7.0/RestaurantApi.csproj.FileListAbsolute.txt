@@ -82,3 +82,5 @@ C:\Users\MSI\source\repos\RestaurantApi\RestaurantApi\obj\Debug\net7.0\ref\Resta
 C:\Users\MSI\source\repos\RestaurantApi\RestaurantApi\bin\Debug\net7.0\Microsoft.AspNetCore.Authentication.JwtBearer.dll
 C:\Users\MSI\source\repos\RestaurantApi\RestaurantApi\bin\Debug\net7.0\AutoMapper.dll
 C:\Users\MSI\source\repos\RestaurantApi\RestaurantApi\bin\Debug\net7.0\AutoMapper.Extensions.Microsoft.DependencyInjection.dll
+C:\Users\MSI\source\repos\RestaurantApi\RestaurantApi\bin\Debug\net7.0\RestaurantApi.xml
+C:\Users\MSI\source\repos\RestaurantApi\RestaurantApi\obj\Debug\net7.0\RestaurantApi.xml

@@ -23,7 +23,10 @@ namespace RestaurantApi.Controllers
             _orderService = orderService;
             _basketService = basketService;
         }
-
+        /// <summary>
+        /// Creating the order from dishes in basket
+        /// </summary>
+        /// <returns></returns>
         [HttpPost("order")]
         public async Task<IActionResult> CreateOrder([FromBody] OrderCreateDto orderCreateDto)
         {
@@ -50,7 +53,10 @@ namespace RestaurantApi.Controllers
                 return StatusCode(500, "Internal Server Error");
             }
         }
-
+        /// <summary>
+        /// Get information about concrete order
+        /// </summary>
+        /// <returns></returns>
         [HttpGet("order/{id}")]
         public async Task<IActionResult> GetOrder(Guid id)
         {
@@ -71,7 +77,10 @@ namespace RestaurantApi.Controllers
                 return StatusCode(500, "Internal Server Error");
             }
         }
-
+        /// <summary>
+        /// Get a list of orders
+        /// </summary>
+        /// <returns></returns>
         [HttpGet("order")]
         public async Task<IActionResult> GetUserOrders()
         {
@@ -94,6 +103,10 @@ namespace RestaurantApi.Controllers
                 return StatusCode(500, "Internal Server Error");
             }
         }
+        /// <summary>
+        /// Confirm order delivery
+        /// </summary>
+        /// <returns></returns>
         [HttpPost("order/{id}/status")]
         public async Task<IActionResult> UpdateOrderStatus(Guid id)
         {

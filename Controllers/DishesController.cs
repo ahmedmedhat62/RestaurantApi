@@ -21,7 +21,10 @@ namespace RestaurantApi.Controllers
             _dishes = dishes;
             _context = context;
         }
-
+        /// <summary>
+        /// Get a list of dishes (menu)
+        /// </summary>
+        /// <returns></returns>
         [HttpGet]
         [ProducesResponseType(200, Type = typeof(IEnumerable<Dishes>))]
         public IActionResult GetDishes( int? PageNumber  , Category? category = null, bool? isvegan = null, Sort? sort = null)
@@ -33,7 +36,10 @@ namespace RestaurantApi.Controllers
             }
             return Ok(dishes);
         }
-
+        /// <summary>
+        /// Get information about concrete dish
+        /// </summary>
+        /// <returns></returns>
         [HttpGet("{id}")]
         [ProducesResponseType(200, Type = typeof(Dishes))]
         [ProducesResponseType(404)]
@@ -46,7 +52,12 @@ namespace RestaurantApi.Controllers
             }
             return Ok(dish);
         }
+        /// <summary>
+        /// Checks if user is able to set rating of the dish
+        /// </summary>
+        /// <returns></returns>
         [HttpGet("{id}/rating/check")]
+        [Authorize]
         [ProducesResponseType(200, Type = typeof(bool))]
         public async Task<IActionResult> UserOrdered(int id)
         {
@@ -63,6 +74,34 @@ namespace RestaurantApi.Controllers
             var userOrdered = await _dishes.UserOrdered(id, userEmail);
 
             return Ok(userOrdered);
+        }
+        /// <summary>
+        /// Set a rating for a dish
+        /// </summary>
+        /// <returns></returns>
+        [HttpPost("{id}/rating")]
+        [Authorize] // Require authentication to access this endpoint
+        [ProducesResponseType(200, Type = typeof(bool))]
+        public async Task<IActionResult> RateDish(int id,  int rate)
+        {
+            // Retrieve user email from claims
+            var userEmail = User.FindFirst(ClaimTypes.Email)?.Value;
+
+            // Check if the user is authenticated
+            if (string.IsNullOrEmpty(userEmail))
+            {
+                return Unauthorized(); // Return 401 Unauthorized status
+            }
+
+            // Use the Rating function from the dishes repository
+            var ratingSuccess = await _dishes.Rating(id, rate, userEmail);
+
+            if (!ratingSuccess)
+            {
+                return BadRequest("Unable to rate the dish. Make sure you have ordered it.");
+            }
+
+            return Ok(true);
         }
 
 

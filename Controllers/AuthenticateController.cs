@@ -20,7 +20,10 @@ namespace RestaurantApi.Controllers
         {
             _usersService = usersService;
         }
-
+        /// <summary>
+        /// Log in to the system
+        /// </summary>
+        /// <returns></returns>
         [HttpPost]
         [Route("login")]
         public async Task<IActionResult> Login([FromBody] LoginModel model)
@@ -40,6 +43,10 @@ namespace RestaurantApi.Controllers
 
             return BadRequest();
         }
+        /// <summary>
+        /// Register new user
+        /// </summary>
+        /// <returns></returns>
         [HttpPost("Register")]
         [AllowAnonymous]
         public async Task<IActionResult> Post(UserRegister model)
@@ -61,6 +68,10 @@ namespace RestaurantApi.Controllers
 
             return BadRequest();
         }
+        /// <summary>
+        /// Edit user profile
+        /// </summary>
+        /// <returns></returns>
         [HttpPut("Profile")]
         [Authorize]
         public async Task<IActionResult> UpdateProfile([FromBody] UserEdit model)
@@ -82,6 +93,10 @@ namespace RestaurantApi.Controllers
             }
         }
 
+        /// <summary>
+        /// Get user profile
+        /// </summary>
+        /// <returns></returns>
         [HttpGet("profile")]
         [Authorize]
         public async Task<ActionResult<UserDTO>> Get()
@@ -102,7 +117,10 @@ namespace RestaurantApi.Controllers
 
             return BadRequest();
         }
-
+        /// <summary>
+        /// Log out to system user
+        /// </summary>
+        /// <returns></returns>
         [HttpPost("logout")]
         [Authorize]
         public async Task<IActionResult> Logout()

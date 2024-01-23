@@ -18,7 +18,10 @@ public class BasketController : ControllerBase
     {
         _basketService = basketService;
     }
-
+    /// <summary>
+    /// Add dish to cart
+    /// </summary>
+    /// <returns></returns>
     [HttpPost("dish/{id}")]
     public async Task<IActionResult> AddToBasket(int id)
     {
@@ -47,7 +50,10 @@ public class BasketController : ControllerBase
             return StatusCode(500, "Internal Server Error");
         }
     }
-
+    /// <summary>
+    /// Get user cart
+    /// </summary>
+    /// <returns></returns>
     [HttpGet("")]
     public async Task<IActionResult> GetDishesInBasket()
     {
@@ -70,6 +76,10 @@ public class BasketController : ControllerBase
         }
     }
 
+    /// <summary>
+    /// Decrease the number of dishes in the cart(if increase = true), or remove the dish completely(increase = false)
+    /// </summary>
+    /// <returns></returns>
     [HttpDelete("dish/{id}")]
     public async Task<IActionResult> RemoveFromBasket(int id , bool? increase = false)
     {

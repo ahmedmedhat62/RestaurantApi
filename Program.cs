@@ -13,6 +13,7 @@ using RestaurantApi.Models;
 using RestaurantApi.Repository;
 using RestaurantApi.Services;
 using System;
+using System.Reflection;
 using System.Security.Claims;
 using System.Text;
 using WebApplication2.Services.Initialization;
@@ -36,6 +37,8 @@ builder.Services.AddScoped<IOrderService, OrderService>();
 builder.Services.AddSwaggerGen(option =>
 {
     option.SwaggerDoc("v1", new OpenApiInfo { Title = "Demo API", Version = "v1" });
+    var xmlFilename = $"{Assembly.GetExecutingAssembly().GetName().Name}.xml";
+    option.IncludeXmlComments(Path.Combine(AppContext.BaseDirectory, xmlFilename));
     option.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme
     {
         In = ParameterLocation.Header,
