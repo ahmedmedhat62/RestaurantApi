@@ -1,4 +1,5 @@
-﻿using RestaurantApi.Data;
+﻿using Microsoft.EntityFrameworkCore;
+using RestaurantApi.Data;
 using RestaurantApi.Interfaces;
 using RestaurantApi.Models;
 
@@ -124,6 +125,12 @@ namespace RestaurantApi.Repository
         public async Task<Dishes> GetDishById1(int dishId)
         {
             return await _context.Dishes.FindAsync(dishId);
+        }
+        public async Task<bool> UserOrdered(int dishId, string userEmail)
+        {
+            return await _context.OrderDTOs
+                .Where(o => o.OrderStatus == status.Delivered && o.useremail == userEmail)
+                .AnyAsync(o => o.Baskets_Dishes.Any(b => b.dishId == dishId));
         }
 
 

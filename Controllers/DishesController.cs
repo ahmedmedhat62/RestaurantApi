@@ -1,8 +1,11 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
+using RestaurantApi.Data;
 using RestaurantApi.Interfaces;
 using RestaurantApi.Models;
+using System.Security.Claims;
 
 namespace RestaurantApi.Controllers
 {
@@ -11,10 +14,12 @@ namespace RestaurantApi.Controllers
     public class DishesController : ControllerBase
     {
         private readonly Idishes _dishes;
+        private readonly DataContext _context;
 
-        public DishesController(Idishes dishes)
+        public DishesController(Idishes dishes, DataContext context )
         {
             _dishes = dishes;
+            _context = context;
         }
 
         [HttpGet]
@@ -41,7 +46,25 @@ namespace RestaurantApi.Controllers
             }
             return Ok(dish);
         }
+        [HttpGet("{id}/rating/check")]
+        [ProducesResponseType(200, Type = typeof(bool))]
+        public async Task<IActionResult> UserOrdered(int id)
+        {
+            // Retrieve user email from claims
+            var userEmail = User.FindFirst(ClaimTypes.Email)?.Value;
 
-      
+            // Check if the user is authenticated
+            if (string.IsNullOrEmpty(userEmail))
+            {
+                return Unauthorized(); // Return 401 Unauthorized status
+            }
+
+            // Use the existing UserOrdered function
+            var userOrdered = await _dishes.UserOrdered(id, userEmail);
+
+            return Ok(userOrdered);
+        }
+
+
     }
 }
