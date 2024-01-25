@@ -43,7 +43,7 @@ namespace RestaurantApi.Controllers
         [HttpGet("{id}")]
         [ProducesResponseType(200, Type = typeof(Dishes))]
         [ProducesResponseType(404)]
-        public IActionResult GetDishById(int id , Category category)
+        public IActionResult GetDishById(int id )
         {
             var dish = _dishes.GetDishesByid(id);
             if (dish == null)
@@ -82,7 +82,9 @@ namespace RestaurantApi.Controllers
         [HttpPost("{id}/rating")]
         [Authorize] // Require authentication to access this endpoint
         [ProducesResponseType(200, Type = typeof(bool))]
-        public async Task<IActionResult> RateDish(int id,  int rate)
+        [ProducesResponseType(401)] // Unauthorized
+        [ProducesResponseType(400, Type = typeof(string))] // Bad Request with error message
+        public async Task<IActionResult> RateDish(int id, int rate)
         {
             // Retrieve user email from claims
             var userEmail = User.FindFirst(ClaimTypes.Email)?.Value;

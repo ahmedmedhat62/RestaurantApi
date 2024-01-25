@@ -7,6 +7,8 @@ using RestaurantApi.Auth;
 using AutoMapper;
 using Microsoft.AspNetCore.Authorization;
 using System.Security.Claims;
+using Microsoft.AspNetCore.Authentication;
+using Microsoft.AspNetCore.Authentication.Cookies;
 
 namespace RestaurantApi.Controllers
 {
@@ -24,24 +26,28 @@ namespace RestaurantApi.Controllers
         /// Log in to the system
         /// </summary>
         /// <returns></returns>
-        [HttpPost]
-        [Route("login")]
+        [HttpPost("login")]
         public async Task<IActionResult> Login([FromBody] LoginModel model)
         {
             try
             {
-                return Ok(await _usersService.Login(model));
+                // Call the Login method in the service, which returns the token upon successful login
+                var token = await _usersService.Login(model);
+
+                // Return the token in the response
+                return Ok(new { Token = token });
             }
             catch (InvalidOperationException ex)
             {
-                // Write logs
+                // Handle login failure
+                // Write logs if needed
+                return BadRequest("Invalid login credentials");
             }
             catch (Exception ex)
             {
+                // Handle other exceptions and log
                 return StatusCode(500);
             }
-
-            return BadRequest();
         }
         /// <summary>
         /// Register new user
@@ -58,15 +64,17 @@ namespace RestaurantApi.Controllers
 
             try
             {
-                await _usersService.Register(model);
-                return Ok();
+                // Call the Register method in the service, which returns the token upon successful registration
+                var token = await _usersService.Register(model);
+
+                // Return the token in the response
+                return Ok(new { Token = token });
             }
             catch (Exception ex)
             {
+                // Handle exceptions and log
                 return StatusCode(500);
             }
-
-            return BadRequest();
         }
         /// <summary>
         /// Edit user profile
@@ -121,19 +129,38 @@ namespace RestaurantApi.Controllers
         /// Log out to system user
         /// </summary>
         /// <returns></returns>
+
         [HttpPost("logout")]
         [Authorize]
-        public async Task<IActionResult> Logout()
+        public IActionResult Logout()
         {
             try
             {
-                await _usersService.Logout();
+                // Retrieve user email from claims
+                var userEmail = User.FindFirst(ClaimTypes.Email)?.Value;
+
+                // Remove the email claim when logging out
+                _usersService.Logout(User, userEmail);
+
+                // Revoke the refresh token (if applicable)
+                // You need to implement the logic for revoking refresh tokens
+
+                // Set the token lifetime to zero to expire the access token immediately
+                var authProperties = new AuthenticationProperties
+                {
+                    ExpiresUtc = DateTime.UtcNow.AddSeconds(0),
+                    IsPersistent = false
+                };
+
+                // Sign out the user
+                HttpContext.SignOutAsync(CookieAuthenticationDefaults.AuthenticationScheme, authProperties);
+
                 return Ok("Logout successful");
             }
             catch (Exception ex)
             {
                 // Handle exceptions and log
-                return StatusCode(500);
+                return StatusCode(500, "Internal Server Error");
             }
         }
 

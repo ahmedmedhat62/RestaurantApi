@@ -1,6 +1,7 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using RestaurantApi.Data;
 using RestaurantApi.Interfaces;
+using RestaurantApi.Migrations;
 using RestaurantApi.Models;
 
 namespace RestaurantApi.Repository
@@ -82,7 +83,10 @@ namespace RestaurantApi.Repository
             var paginatedDishes = query.Skip((pageNumber - 1) * pageSize)
                                       .Take(pageSize)
                                       .ToList();
-
+            foreach (var dish in paginatedDishes)
+            {
+                dish.Rating = CalculateAverageRating(dish.Id);
+            }
             return paginatedDishes;
         }
 
@@ -119,12 +123,20 @@ namespace RestaurantApi.Repository
 
         public Dishes GetDishesByid(int dishId)
         {
-            return _context.Dishes.FirstOrDefault(x => x.Id == dishId);
+            var dish = _context.Dishes.FirstOrDefault(x => x.Id == dishId);
+
+            if (dish != null)
+            {
+                // Set Rating to AverageRating
+                dish.Rating = CalculateAverageRating(dishId);
+            }
+
+            return dish;
         }
 
-       // public async Task<Dishes> GetDishById1(int dishId)
+        // public async Task<Dishes> GetDishById1(int dishId)
         //{
-          //  return await _context.Dishes.FindAsync(dishId);
+        //  return await _context.Dishes.FindAsync(dishId);
         //}
         public async Task<bool> UserOrdered(int dishId, string userEmail)
         {
@@ -151,13 +163,44 @@ namespace RestaurantApi.Repository
                 return false; // Dish not found
             }
 
-            // Update the dish's rating
-            dish.Rating = rating;
+            // Update the dish's rating only if the user hasn't rated it before
+            var existingRating = _context.Ratings.FirstOrDefault(r => r.DishId == id && r.UserEmail == useremail);
+
+            if (existingRating != null)
+            {
+                // User has already rated the dish, update the existing rating
+                existingRating.Rating = rating;
+            }
+            else
+            {
+                // User hasn't rated the dish before, create a new rating entry
+                var newRating = new Models.Ratings
+                {
+                    DishId = id,
+                    UserEmail = useremail,
+                    Rating = rating
+                };
+
+                _context.Ratings.Add(newRating);
+            }
 
             // Save changes to the database
             await _context.SaveChangesAsync();
 
             return true; // Rating updated successfully
+        }
+        private double CalculateAverageRating(int dishId)
+        {
+            var ratings = _context.Ratings.Where(r => r.DishId == dishId).ToList();
+
+            if (ratings.Count == 0)
+            {
+                return 0; // No ratings yet
+            }
+
+            // Calculate average rating
+            var sumOfRatings = ratings.Sum(r => r.Rating);
+            return (double)sumOfRatings / ratings.Count;
         }
 
 

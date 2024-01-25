@@ -42,7 +42,7 @@ namespace RestaurantApi.Services
                 }
 
                 int totalPrice = basket.Dishes.Sum(d => d.Price * d.Amount);
-
+              
                 var orderDto = new OrderDTO
                 {
                     useremail = userEmail,
@@ -55,6 +55,11 @@ namespace RestaurantApi.Services
                     
                     Baskets_Dishes = basket.Dishes.ToList()
                 };
+                if (orderDto.deliveryTime <= DateTime.UtcNow.AddMinutes(60))
+                {
+                    // Return a 400 Bad Request error
+                    throw new ArgumentException("Invalid delivery time. Delivery time must be more than the current datetime by 60 minutes.");
+                }
 
                 _dbContext.OrderDTOs.Add(orderDto);
                 await _dbContext.SaveChangesAsync();

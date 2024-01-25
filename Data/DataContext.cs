@@ -23,6 +23,7 @@ namespace RestaurantApi.Data
          //   builder.Entity<DishBasketDTO>().Ignore(Dis);
 
         }
+        public DbSet<Ratings> Ratings { get; set; }
         public DbSet<Dishes> Dishes { get; set; }
         public DbSet<Basket> Baskets { get; set; }
         public DbSet<DishBasketDTO> dishBasketDTOs { get; set; }

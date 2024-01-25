@@ -6,16 +6,17 @@ using RestaurantApi.Models;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Text;
+using System.Text.RegularExpressions;
 
 namespace RestaurantApi.Interfaces
 {
     public interface IUsersService
     {
-        Task Register(UserRegister model);
+        Task<string> Register(UserRegister model);
         Task<UserDTO> GetProfile(string email);
         Task<string> Login(LoginModel model);
         Task UpdateProfile(string email, UserEdit model);
-        Task Logout();
+        Task Logout(ClaimsPrincipal user, string userEmail);
     }
 
     public class UsersService : IUsersService
@@ -61,10 +62,24 @@ namespace RestaurantApi.Interfaces
 
             return GenerateToken(user, await _userManager.IsInRoleAsync(user, Roles.Admin));
         }
-        public  async Task Logout() 
+        public async Task Logout(ClaimsPrincipal user, string userEmail)
         {
+            
+            // Sign the user out (clear authentication cookie)
             await _signInManager.SignOutAsync();
+
+            // If user is authenticated and has an email claim, remove it
+            if (!string.IsNullOrEmpty(userEmail))
+            {
+                var currentUser = await _userManager.FindByEmailAsync(userEmail);
+                if (currentUser != null)
+                {
+                    // Remove the email claim
+                    await _userManager.RemoveClaimAsync(currentUser, new Claim(ClaimTypes.Email, userEmail));
+                }
+            }
         }
+
         public async Task UpdateProfile(string email, UserEdit model)
         {
             var user =  await _userManager.FindByEmailAsync(email);
@@ -95,14 +110,18 @@ namespace RestaurantApi.Interfaces
             }
         }
 
-        public async Task Register(UserRegister model)
+        public async Task<string> Register(UserRegister model)
         {
-            
             var existingUser = await _userManager.FindByEmailAsync(model.Email);
             if (existingUser != null)
             {
-                throw new ArgumentException("User with same email already exists");
+                throw new ArgumentException("User with the same email already exists");
             }
+
+            /*if (!IsValidPhoneNumber(model.PhoneNumber))
+            {
+                throw new ArgumentException("Invalid phone number format");
+            }*/
 
             var identityUser = new User1
             {
@@ -115,11 +134,14 @@ namespace RestaurantApi.Interfaces
                 Gender = model.Gender
             };
 
-            var result = await _userManager.CreateAsync(identityUser,model.Password);
+            var result = await _userManager.CreateAsync(identityUser, model.Password);
             if (!result.Succeeded)
             {
                 throw new Exception("Some errors during creating user");
             }
+
+            // If user registration is successful, generate and return the token
+            return GenerateToken(identityUser, await _userManager.IsInRoleAsync(identityUser, Roles.Admin));
         }
 
         private async Task<User1> ValidateUser(LoginModel credentials)
@@ -134,7 +156,14 @@ namespace RestaurantApi.Interfaces
 
             return null;
         }
-        
+        private bool IsValidPhoneNumber(string phoneNumber)
+        {
+            // Use a regular expression to check if the phone number matches the desired format
+            // Adjust the regular expression according to your specific requirements
+            var regex = new Regex(@"^\+\d{1,2}\s\(\d{3}\)\s\d{3}-\d{2}-\d{2}-\d{2}$");
+            return regex.IsMatch(phoneNumber);
+        }
+
         private string GenerateToken(User1 user, bool isAdmin)
         {
             var tokenHandler = new JwtSecurityTokenHandler();
